@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fontis Australia Extension for Magento 2
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category   Fontis
+ * @package    Fontis_Australia
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (http://www.fontis.com.au)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <fontis_australia_bpay>
+                <model>Fontis\Australia\Model\Payment\BPAY\PaymentMethod</model>
+                <group>offline</group>
+                <active>0</active>
+                <title>BPAY</title>
+                <order_status>pending</order_status>
+                <calculate_using_customerid>0</calculate_using_customerid>
+                <accept_credit_cards>1</accept_credit_cards>
+                <generate_using_mod10V5>1</generate_using_mod10V5>
+                <message>Payment details will be displayed on order confirmation screen.</message>
+                <customer_group_access>0</customer_group_access>
+                <allowspecific>0</allowspecific>
+            </fontis_australia_bpay>
+            <fontis_australia_directdeposit>
+                <model>Fontis\Australia\Model\Payment\DirectDeposit\PaymentMethod</model>
+                <group>offline</group>
+                <active>0</active>
+                <title>Direct Deposit</title>
+                <order_status>pending</order_status>
+                <message>Please quote order number (displayed after checkout confirmation) when making your deposit. Order will be processed once payment has been received.</message>
+                <customer_group_access>0</customer_group_access>
+                <allowspecific>0</allowspecific>
+            </fontis_australia_directdeposit>
+        </payment>
+    </default>
+</config>

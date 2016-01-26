@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Fontis Australia Extension for Magento 2
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category   Fontis
+ * @package    Fontis_Australia
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (http://www.fontis.com.au)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="fontisAustraliaPaymentBpayCustomerGroupAccessCheckFactory" type="Fontis\CustomerGroupAccess\AccessCheckFactory">
+        <arguments>
+            <argument name="configPathPrefix" xsi:type="string">payment/fontis_australia_bpay</argument>
+        </arguments>
+    </virtualType>
+    <type name="Fontis\Australia\Model\Payment\BPAY\PaymentMethod">
+        <arguments>
+            <argument name="accessCheckFactory" xsi:type="object">fontisAustraliaPaymentBpayCustomerGroupAccessCheckFactory</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="fontisAustraliaPaymentDirectDepositCustomerGroupAccessCheckFactory" type="Fontis\CustomerGroupAccess\AccessCheckFactory">
+        <arguments>
+            <argument name="configPathPrefix" xsi:type="string">payment/fontis_australia_directdeposit</argument>
+        </arguments>
+    </virtualType>
+    <type name="Fontis\Australia\Model\Payment\DirectDeposit\PaymentMethod">
+        <arguments>
+            <argument name="accessCheckFactory" xsi:type="object">fontisAustraliaPaymentDirectDepositCustomerGroupAccessCheckFactory</argument>
+        </arguments>
+    </type>
+</config>
