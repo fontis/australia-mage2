@@ -11,7 +11,7 @@
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (http://www.fontis.com.au)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -33,7 +33,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Model\Method\Logger as PaymentMethodLogger;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb as AbstractDbCollection;
-use Magento\Checkout\Model\Session\Proxy as CheckoutSessionProxy;
+use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Magento\Backend\Model\Session\Quote\Proxy as BackendQuoteSessionProxy;
 use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Sales\Model\Order\Payment as OrderPayment;
@@ -75,7 +75,7 @@ class PaymentMethod extends AbstractMethod implements CheckoutConfigInterface
     protected $refGenerator;
 
     /**
-     * @var CheckoutSessionProxy
+     * @var CheckoutSession
      */
     protected $checkoutSession;
 
@@ -94,7 +94,7 @@ class PaymentMethod extends AbstractMethod implements CheckoutConfigInterface
      * @param PaymentMethodLogger $paymentLogger
      * @param CustomerGroupAccessCheckFactory $accessCheckFactory
      * @param BpayRefGenerator $refGenerator
-     * @param CheckoutSessionProxy $checkoutSession
+     * @param CheckoutSession $checkoutSession
      * @param BackendQuoteSessionProxy $backendQuoteSession
      * @param AbstractResource $abstractResource
      * @param AbstractDbCollection $abstractDbCollection
@@ -111,7 +111,7 @@ class PaymentMethod extends AbstractMethod implements CheckoutConfigInterface
         PaymentMethodLogger $paymentLogger,
         CustomerGroupAccessCheckFactory $accessCheckFactory,
         BpayRefGenerator $refGenerator,
-        CheckoutSessionProxy $checkoutSession,
+        CheckoutSession $checkoutSession,
         BackendQuoteSessionProxy $backendQuoteSession,
         AbstractResource $abstractResource = null,
         AbstractDbCollection $abstractDbCollection = null,

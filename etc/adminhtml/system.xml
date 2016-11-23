@@ -12,16 +12,138 @@
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (http://www.fontis.com.au)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
+        <tab id="fontis_extensions" translate="label" sortOrder="2000000">
+            <label>Fontis Extensions</label>
+        </tab>
+        <section id="fontis_australia" translate="label" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Australia</label>
+            <tab>fontis_extensions</tab>
+            <resource>Fontis_Australia::config</resource>
+            <group id="clickandsend" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Australia Post Click &amp; Send</label>
+                <comment><![CDATA[
+                Allows merchants to export a CSV of selected orders into the Click & Send service for bulk processing. Please note the generated CSV file won't work if you select "Pick and Ship" when importing into Click & Send.
+                ]]></comment>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Please note you won't be able to import the Courier Post shipping methods or standard shipping methods that have options, e.g. "Parcel Post + Extra Cover", into Click &amp; Send.</comment>
+                </field>
+                <field id="filter" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Filter Shipping Methods</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Don't display Australia Post shipping methods that can't be imported into Click &amp; Send during checkout.</comment>
+                </field>
+            </group>
+            <group id="postcode_autocomplete" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Postcode Autocomplete</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="max_results" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum Number of Results</label>
+                    <validate>validate-number</validate>
+                </field>
+            </group>
+        </section>
+        <section id="fontis_eparcelexport" translate="label" sortOrder="501" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <tab>fontis_extensions</tab>
+            <label>eParcel Export</label>
+            <resource>Fontis_Australia::config</resource>
+            <group id="email_notification" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Email Notification</label>
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Add the customer's email address to the CSV file.</comment>
+                </field>
+                <field id="level" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notification Level</label>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\EmailNotificationLevel</source_model>
+                    <comment>Set what kind of email notification the customer will receive.</comment>
+                </field>
+            </group>
+            <group id="parcel" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Parcel Settings</label>
+                <field id="use_cubicweight" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use Cubic Weight ?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Ask your Australia Post account manager how your account is setup.</comment>
+                </field>
+                <field id="weightmax" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Parcel Max Weight</label>
+                    <comment>Kilograms (without box weight)</comment>
+                    <validate>validate-number</validate>
+                </field>
+                <field id="width" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Parcel Width</label>
+                    <comment>Centimetres - no decimals</comment>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="height" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Parcel Height</label>
+                    <comment>Centimetres - no decimals</comment>
+                    <validate>validate-number</validate>
+                </field>
+                <field id="length" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Parcel Length</label>
+                    <comment>Centimetres - no decimals</comment>
+                    <validate>validate-digits</validate>
+                </field>
+            </group>
+            <group id="consignment" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Consignment Defaults</label>
+                <field id="is_signature_required" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is Signature Required?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Should signature be required by default ? Specific shipping methods will override this setting. Check cost of service on your Australia Post contract.</comment>
+                </field>
+                <field id="add_to_address_book" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Add to Address Book?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="print_ref1" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Print Reference #1?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="print_ref2" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Print Reference #2?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="charge_codes" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Charge codes</label>
+                <field id="allow_custom_charge_codes" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom eParcel Charge Code</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Allow custom (non-standard) charge codes from uploaded CSV files? For example, "3I55".</comment>
+                </field>
+                <field id="default_charge_code_individual" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Charge Code (Individual)</label>
+                    <comment>The default charge code for individuals. Will be overridden by values in your table rates.</comment>
+                </field>
+                <field id="default_charge_code_business" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Charge Code (Business)</label>
+                    <comment>The default charge code for businesses, as defined by the customer groups below. Will be overridden by values in your table rates.</comment>
+                </field>
+                <field id="business_groups" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Business Customer Groups</label>
+                    <source_model>Fontis\CustomerGroupAccess\Source\CustomerGroup</source_model>
+                    <comment>The selected customer groups will use the "Business" version of the "Standard" and "Express" charge codes. Make sure your contract supports business (B2B) charge codes.</comment>
+                </field>
+            </group>
+        </section>
         <section id="payment">
             <group id="fontis_australia_bpay" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>BPAY</label>
-
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -29,7 +151,6 @@
                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
-
                 <field id="biller_code" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Biller Code</label>
                 </field>
@@ -37,7 +158,6 @@
                     <label>Message</label>
                     <comment>Displayed during checkout. Customise this to notify your customers that they will be presented with BPAY information after checkout.</comment>
                 </field>
-
                 <field id="calculate_using_customerid" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use Customer ID for Ref</label>
                     <comment>Normally set to NO unless you use BPAY for recurring payments. Guest checkouts are NOT supported if this is set to YES.</comment>
@@ -53,7 +173,6 @@
                     <comment>If set to NO, Mod 10 Version 1 is used.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-
                 <field id="customer_group_access" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Customer Group Access</label>
                     <source_model>Fontis\CustomerGroupAccess\Source\CustomerGroupAccess</source_model>
@@ -81,7 +200,6 @@
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                 </field>
             </group>
-
             <group id="fontis_australia_directdeposit" translate="label" type="text" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Direct Deposit (AU)</label>
 
@@ -130,6 +248,186 @@
                 </field>
                 <field id="specificcountry" translate="label" type="multiselect" sortOrder="62" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
+            </group>
+        </section>
+        <section id="carriers">
+            <group id="australia_post" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Australia Post</label>
+
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="developer_mode" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Developer Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Use the Australia Post test environment to get shipping rates. Not recommended for production use.</comment>
+                </field>
+                <field id="api_key" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Api Key</label>
+                    <comment>Register for an API key at: http://auspost.com.au/devcentre/registration.html</comment>
+                </field>
+                <field id="allowed_methods" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allowed Methods</label>
+
+                    <source_model>Fontis\Australia\Model\Shipping\Source\AllowedMethods</source_model>
+                </field>
+                <field id="signature_on_delivery" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Signature on Delivery</label>
+                    <comment>Controls whether shipping methods with the Signature on Delivery option are shown. If set to 'Required', only shipping methods with this option will be shown. If set to 'Never', shipping methods with this option will not be shown. If set to 'Optional', shipping methods both with and without this option will be shown, allowing the customer to choose.</comment>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\Visibility</source_model>
+                </field>
+                <field id="extra_cover" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Extra Cover</label>
+                    <comment>Controls whether shipping methods with the Extra Cover option are shown (see above).</comment>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\Visibility</source_model>
+                </field>
+                <field id="pick_up" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pick Up (Metro Only)</label>
+                    <comment>Controls whether shipping methods with the Pick Up option are shown (see above).</comment>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\Visibility</source_model>
+                </field>
+
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ship to Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ship to Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
+                <field id="length_attribute" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Length Attribute</label>
+                    <comment>Product attribute code used for length. This will be used to calculate shipping
+                        rates for orders with only one product. For orders with more than one product (or
+                        if this field is not set) then Default Parcel Length will be used for calculating prices.</comment>
+                </field>
+                <field id="default_length" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Parcel Length (cm)</label>
+
+                </field>
+                <field id="width_attribute" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Width Attribute</label>
+                    <comment>Product attribute code used for width (see above).</comment>
+                </field>
+                <field id="default_width" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Parcel Width (cm)</label>
+                </field>
+                <field id="specificerrmsg" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Displayed Error Message</label>
+                </field>
+                <field id="showmethod" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Method if Not Applicable</label>
+                    <frontend_class>shipping-skip-hide</frontend_class>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                </field>
+            </group>
+            <group id="eparcel" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Australia Post eParcel</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="name" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Method name</label>
+                </field>
+                <field id="condition_name" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Condition</label>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\EparcelCondition</source_model>
+                </field>
+                <field id="export" translate="label comment" type="button" sortOrder="5" showInDefault="0" showInWebsite="1" showInStore="0">
+                    <label>Export</label>
+                    <frontend_model>Fontis\Australia\Block\Eparcel\RateExport</frontend_model>
+                </field>
+                <field id="import" translate="label" type="file" sortOrder="6" showInDefault="0" showInWebsite="1" showInStore="0">
+                    <label>Import</label>
+                    <upload_dir config="system/filesystem/media" scope_info="1">eparcel/uploaded</upload_dir>
+                    <backend_model>Fontis\Australia\Model\Config\Backend\Eparcel</backend_model>
+                </field>
+                <field id="handling_type" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Calculate Handling Fee</label>
+                    <source_model>Magento\Shipping\Model\Source\HandlingType</source_model>
+                </field>
+                <field id="handling_fee" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Handling Fee</label>
+                </field>
+                <field id="merchant_location_id" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Location ID</label>
+                    <comment>Provided by Australia Post. The unique ID specifying a specific merchant location.</comment>
+                </field>
+                <field id="post_charge_account" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Post Charge To Account</label>
+                    <comment>Merchant account to which Australia Post "post" the charges against for invoicing purposes.</comment>
+                </field>
+                <field id="signature_required" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Signature Required</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If Yes, Australia Post will attempt to capture a signature and if no-one is in attendance the consignment will be "carded".</comment>
+                </field>
+                <field id="signature_cost" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Signature Cost</label>
+                    <comment>Additional amount to charge for requiring a signature.</comment>
+                </field>
+                <field id="insurance_enable" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Insurance</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="insurance_step" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Insurance Step</label>
+                    <comment>If insurance is $1.05 per $100, set this field to 100.0</comment>
+                </field>
+                <field id="insurance_cost_per_step" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Insurance Cost Per Step</label>
+                    <comment>If insurance is $1.05 per $100, set this field to 1.05</comment>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                </field>
+                <field id="return_name" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Address Name</label>
+                </field>
+                <field id="return_addressline_1" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Address Line 1</label>
+                </field>
+                <field id="return_addressline_2" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Address Line 2</label>
+                </field>
+                <field id="return_addressline_3" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Address Line 3</label>
+                </field>
+                <field id="return_addressline_4" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Address Line 4</label>
+                </field>
+                <field id="return_suburb" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Suburb</label>
+                </field>
+                <field id="return_state" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return State Code</label>
+                    <comment>Must be a two- or three-letter state code</comment>
+                </field>
+                <field id="return_postcode" translate="label" type="text" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Postcode</label>
+                </field>
+                <field id="specificerrmsg" translate="label" type="textarea" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Displayed Error Message</label>
+                </field>
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ship to Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="27" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ship to Specific Countries</label>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                 </field>
             </group>

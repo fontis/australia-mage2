@@ -12,13 +12,14 @@
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (http://www.fontis.com.au)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Fontis_Australia" setup_version="0.2.1">
+    <module name="Fontis_Australia" setup_version="0.3.0">
         <sequence>
+            <module name="Magento_Shipping"/>
             <module name="Magento_Store" />
             <module name="Magento_Directory" />
             <module name="Magento_Payment" />

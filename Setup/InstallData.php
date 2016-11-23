@@ -11,7 +11,7 @@
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (http://www.fontis.com.au)
+ * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -23,12 +23,26 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 
 class InstallData implements InstallDataInterface
 {
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @param ModuleContextInterface $context
+     */
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
+    {
+        $setup->startSetup();
+        $this->addAustralianRegions($setup);
+        $setup->endSetup();
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     */
+    protected function addAustralianRegions(ModuleDataSetupInterface $setup)
     {
         $countryRegionTable = $setup->getTable("directory_country_region");
         $countryRegionNameTable = $setup->getTable("directory_country_region_name");
 
-        $data = [
+        $states = [
             ["ACT", "Australian Capital Territory"],
             ["NSW", "New South Wales"],
             ["NT", "Northern Territory"],
@@ -39,15 +53,15 @@ class InstallData implements InstallDataInterface
             ["WA", "Western Australia"],
         ];
 
-        foreach ($data as $row) {
-            $bind = ["country_id" => "AU", "code" => $row[0], "default_name" => $row[1]];
+        foreach ($states as $state) {
+            $bind = ["country_id" => "AU", "code" => $state[0], "default_name" => $state[1]];
             $setup->getConnection()->insert($countryRegionTable, $bind);
             $regionId = $setup->getConnection()->lastInsertId($countryRegionTable);
 
             $columns = ["locale", "region_id", "name"];
             $values = [
-                ["en_AU", $regionId, $row[1]],
-                ["en_US", $regionId, $row[1]],
+                ["en_AU", $regionId, $state[1]],
+                ["en_US", $regionId, $state[1]],
             ];
             $setup->getConnection()->insertArray($countryRegionNameTable, $columns, $values);
         }
