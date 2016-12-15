@@ -318,9 +318,12 @@ class Eparcel
             $table = $this->getMainTable();
             $websiteId = $object->getScopeId();
 
+            // Use the $_POST superglobal directly as we don't have access to the request object
+            // @codingStandardsIgnoreLine
             if (isset($_POST['groups']['eparcel']['fields']['condition_name']['inherit'])) {
                 $conditionName = (string) $this->scopeConfig->getValue('carriers/eparcel/condition_name', ScopeInterface::SCOPE_STORE, $this->storeManager->getStore()->getId());
             } else {
+                // @codingStandardsIgnoreLine
                 $conditionName = $_POST['groups']['eparcel']['fields']['condition_name']['value'];
             }
         }
