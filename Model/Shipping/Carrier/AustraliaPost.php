@@ -155,7 +155,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
             $destCountry = DataHelper::AUSTRALIA_COUNTRY_CODE;
         }
 
-        $weight = (int) $request->getPackageWeight();
+        $weight = (float) $request->getPackageWeight();
         $length = (int) $this->getAttribute($request, 'length');
         $width = (int) $this->getAttribute($request, 'width');
         $height = (int) $this->getAttribute($request, 'height');
