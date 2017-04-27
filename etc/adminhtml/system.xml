@@ -8,12 +8,12 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2017 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
@@ -25,7 +25,14 @@
             <label>Australia</label>
             <tab>fontis_extensions</tab>
             <resource>Fontis_Australia::config</resource>
-            <group id="clickandsend" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+            <group id="australia_post" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Australia Post</label>
+                <field id="api_key" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>API Key</label>
+                    <comment>Register for an API key at: https://developers.auspost.com.au/apis/pacpcs-registration</comment>
+                </field>
+            </group>
+            <group id="clickandsend" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Australia Post Click &amp; Send</label>
                 <comment><![CDATA[
                 Allows merchants to export a CSV of selected orders into the Click & Send service for bulk processing. Please note the generated CSV file won't work if you select "Pick and Ship" when importing into Click & Send.
@@ -41,13 +48,17 @@
                     <comment>Don't display Australia Post shipping methods that can't be imported into Click &amp; Send during checkout.</comment>
                 </field>
             </group>
-            <group id="postcode_autocomplete" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="postcode_autocomplete" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Postcode Autocomplete</label>
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="max_results" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="remove_post_office_boxes" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Remove "Post Office Boxes"?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="max_results" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Maximum Number of Results</label>
                     <validate>validate-number</validate>
                 </field>
@@ -267,10 +278,6 @@
                     <label>Developer Mode</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Use the Australia Post test environment to get shipping rates. Not recommended for production use.</comment>
-                </field>
-                <field id="api_key" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Api Key</label>
-                    <comment>Register for an API key at: http://auspost.com.au/devcentre/registration.html</comment>
                 </field>
                 <field id="allowed_methods" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allowed Methods</label>

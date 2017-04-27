@@ -7,12 +7,12 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2017 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 namespace Fontis\Australia\Helper;
@@ -27,9 +27,7 @@ class Data extends AbstractHelper
 
     const MAX_AUTOCOMPLETE_RESULTS_DEFAULT = 20;
 
-    const MAX_QUERY_LEN = 100;
-
-    const XML_PATH_POSTCODE_AUTOCOMPLETE_ENABLED = 'fontis_australia/postcode_autocomplete/enabled';
+    const XML_PATH_POSTCODE_AUTOCOMPLETE_ENABLED = 'fontis_australia/postcode_autocomplete/active';
 
     /**
      * Checks whether postcode autocomplete is enabled.
@@ -61,5 +59,23 @@ class Data extends AbstractHelper
         } else {
             return self::MAX_AUTOCOMPLETE_RESULTS_DEFAULT;
         }
+    }
+
+    /**
+     * @param mixed $store
+     * @return string
+     */
+    public function getAPIKey($store = null)
+    {
+        return $this->scopeConfig->getValue("fontis_australia/australia_post/api_key", ScopeInterface::SCOPE_STORE, $store);
+    }
+
+    /**
+     * @param mixed $store
+     * @return bool
+     */
+    public function shouldRemovePostOfficeBoxes($store = null)
+    {
+        return $this->scopeConfig->isSetFlag("fontis_australia/postcode_autocomplete/remove_post_office_boxes", ScopeInterface::SCOPE_STORE, $store);
     }
 }

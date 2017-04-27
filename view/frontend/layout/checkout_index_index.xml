@@ -8,15 +8,18 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * https://opensource.org/licenses/osl-3.0.php
  *
  * @category   Fontis
  * @package    Fontis_Australia
- * @copyright  Copyright (c) 2016 Fontis Pty. Ltd. (https://www.fontis.com.au)
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2017 Fontis Pty. Ltd. (https://www.fontis.com.au)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Fontis_Australia::css/postcode-autocomplete.css"/>
+    </head>
     <body>
         <referenceBlock name="checkout.root">
             <arguments>
@@ -26,6 +29,25 @@
                             <item name="children" xsi:type="array">
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+
+                                                <item name="shippingAddress" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shipping-address-fieldset" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="postcode-autocomplete" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Fontis_Australia/js/view/shippingaddress/postcode-autocomplete</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="deps" xsi:type="string">checkout.steps.shipping-step.shippingAddress</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
                                         <item name="billing-step" xsi:type="array">
                                             <item name="children" xsi:type="array">
                                                 <item name="payment" xsi:type="array">

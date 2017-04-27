@@ -15,11 +15,10 @@
  * @copyright  Copyright (c) 2017 Fontis Pty. Ltd. (https://www.fontis.com.au)
  * @license    https://opensource.org/licenses/osl-3.0.php  Open Soft
 -->
-
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
-    <router id="admin">
-        <route id="fontis_australia" frontName="fontis_australia">
-            <module name="Fontis_Australia" before="Magento_Backend" />
+    <router id="standard">
+        <route id="fontis_australia" frontName="australia">
+            <module name="Fontis_Australia"/>
         </route>
     </router>
 </config>
