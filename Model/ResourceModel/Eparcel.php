@@ -24,6 +24,8 @@ use Fontis\Australia\Model\Shipping\Carrier\Eparcel as EparcelShipping;
 use Magento\Directory\Model\ResourceModel\Country\Collection as CountryCollection;
 use Magento\Directory\Model\ResourceModel\Region\Collection as RegionCollection;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\App\Request\Http\Proxy as HttpProxy;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote\Address\RateRequest;
@@ -55,6 +57,9 @@ class Eparcel
     /** @var array */
     private $exceptions;
 
+    /** @var Http */
+    protected $request;
+
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
@@ -62,6 +67,7 @@ class Eparcel
      * @param RegionCollection $regionCollection
      * @param EparcelHelper $eparcelHelper
      * @param ResourceConnection $coreResource
+     * @param HttpProxy $request
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -69,7 +75,8 @@ class Eparcel
         CountryCollection $countryCollection,
         RegionCollection $regionCollection,
         EparcelHelper $eparcelHelper,
-        ResourceConnection $coreResource
+        ResourceConnection $coreResource,
+        HttpProxy $request
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -77,6 +84,7 @@ class Eparcel
         $this->regionCollection = $regionCollection;
         $this->eparcelHelper = $eparcelHelper;
         $this->coreResource = $coreResource;
+        $this->request = $request;
     }
 
     /**
@@ -307,24 +315,26 @@ class Eparcel
      */
     public function uploadAndImport(BackendEparcel $object)
     {
-        $csvFile = $object->getUploadDir() . DIRECTORY_SEPARATOR . $object->getValue();
+        if (empty($object->getValue())) {
+            return;
+        }
+
+        $csvFile = $object->getUploadDir() . DIRECTORY_SEPARATOR . $object->getFieldsetDataValue('import')['name'];
 
         if (!empty($csvFile)) {
             if (!is_readable($csvFile)) {
                 throw new Exception("Eparcel import file is not readable");
             }
 
+            $postedData = $this->request->getPostValue();
             $csv = trim(file_get_contents($csvFile));
             $table = $this->getMainTable();
             $websiteId = $object->getScopeId();
 
-            // Use the $_POST superglobal directly as we don't have access to the request object
-            // @codingStandardsIgnoreLine
-            if (isset($_POST['groups']['eparcel']['fields']['condition_name']['inherit'])) {
+            if (isset($postedData['groups']['eparcel']['fields']['condition_name']['inherit'])) {
                 $conditionName = (string) $this->scopeConfig->getValue('carriers/eparcel/condition_name', ScopeInterface::SCOPE_STORE, $this->storeManager->getStore()->getId());
             } else {
-                // @codingStandardsIgnoreLine
-                $conditionName = $_POST['groups']['eparcel']['fields']['condition_name']['value'];
+                $conditionName = $postedData['groups']['eparcel']['fields']['condition_name']['value'];
             }
         }
 
