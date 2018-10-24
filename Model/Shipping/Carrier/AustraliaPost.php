@@ -26,17 +26,19 @@ use Exception;
 use Fontis\Australia\Helper\ClickAndSend;
 use Fontis\Australia\Helper\Data as DataHelper;
 use Fontis\Australia\Model\Shipping\Source\Visibility;
-use Magento\Catalog\Model\Product\Type as ProductType;
+use Guzzle\Http\ClientInterface;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\Method;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Config;
-use Magento\Shipping\Model\Rate\Result;
+use Magento\Shipping\Model\Rate\Result as RateResult;
 use Magento\Shipping\Model\Rate\ResultFactory;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
@@ -45,14 +47,10 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
 {
     const EXTRA_COVER_LIMIT = 5000;
 
-    /** @var RateResult  */
-    protected $_result = null;
-
-    /** @var PostageClient */
-    protected $_client = null;
+    const CARRIER_CODE = 'australia_post';
 
     /** @var string */
-    protected $_code = 'australia_post';
+    protected $_code = self::CARRIER_CODE;
 
     /** @var ResultFactory */
     protected $_rateResultFactory;
@@ -66,6 +64,20 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
     /** @var CheckoutSession */
     protected $checkoutSession;
 
+    /** @var DataHelper */
+    protected $dataHelper;
+
+    /**
+     * @param CheckoutSession $checkoutSession
+     * @param ClickAndSend $clickandsendHelper
+     * @param ErrorFactory $rateErrorFactory
+     * @param LoggerInterface $logger
+     * @param MethodFactory $rateMethodFactory
+     * @param ResultFactory $rateResultFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param DataHelper $dataHelper
+     * @param array $data
+     */
     public function __construct(
         CheckoutSession $checkoutSession,
         ClickAndSend $clickandsendHelper,
@@ -74,43 +86,15 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
         MethodFactory $rateMethodFactory,
         ResultFactory $rateResultFactory,
         ScopeConfigInterface $scopeConfig,
+        DataHelper $dataHelper,
         array $data = []
     ) {
         $this->_clickandsendHelper = $clickandsendHelper;
         $this->_rateResultFactory = $rateResultFactory;
         $this->_rateMethodFactory = $rateMethodFactory;
         $this->checkoutSession = $checkoutSession;
+        $this->dataHelper = $dataHelper;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
-        $this->prepareModel();
-    }
-
-    /**
-     * Prepare needed object and config data
-     *
-     * @return void
-     */
-    private function prepareModel()
-    {
-        $apiKey = $this->getConfigData('api_key');
-
-        $config = array();
-
-        if ($this->isAustraliaPostDeveloperMode()) {
-            $config = array(
-                'developer_mode' => true,
-                'auth_key' => $apiKey
-            );
-        } else {
-            if ($apiKey) {
-                $config = array('auth_key' => $apiKey);
-            }
-        }
-
-        if (!empty($config)) {
-            $this->_client = Auspost::factory($config)->get('postage');
-        }
-
-        $this->_result = $this->_rateResultFactory->create();
     }
 
     /**
@@ -135,14 +119,17 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
             return false;
         }
 
+        /** @var PostageClient $client */
+        $client = $this->getAuspostApiClient($request);
+
         // Check if this method is even applicable (shipping from Australia)
         $origCountryId = $this->_scopeConfig->getValue(Config::XML_PATH_ORIGIN_COUNTRY_ID, ScopeInterface::SCOPE_STORE, $request->getStoreId());
 
-        if ($origCountryId != DataHelper::AUSTRALIA_COUNTRY_CODE) {
+        if ($client === null) {
             return false;
         }
 
-        if ($this->_client === null) {
+        if ($origCountryId != DataHelper::AUSTRALIA_COUNTRY_CODE) {
             return false;
         }
 
@@ -171,7 +158,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
             'country_code' => $destCountry
         );
 
-        return $this->getQuotes($extraCover, $config);
+        return $this->getQuotes($extraCover, $config, $client);
     }
 
     /**
@@ -285,23 +272,52 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
     }
 
     /**
+     * @param RateRequest $request
+     * @return ClientInterface|null
+     */
+    protected function getAuspostApiClient(RateRequest $request)
+    {
+        $apiKey = $this->dataHelper->getAPIKey($request->getStoreId());
+        $config = array();
+
+        if ($this->isAustraliaPostDeveloperMode()) {
+            $config = array(
+                'developer_mode' => true,
+                'auth_key' => $apiKey
+            );
+        } else {
+            if ($apiKey) {
+                $config = array('auth_key' => $apiKey);
+            }
+        }
+
+        if (empty($config)) {
+            return null;
+        }
+
+        return Auspost::factory($config)->get('postage');
+    }
+
+    /**
      * @param int $destCountry
      * @param array $config
      * @param string $serviceCode
      * @param string $serviceName
      * @param string $serviceOptionName
      * @param string $serviceOptionCode
+     * @param ClientInterface $client
+     * @return Method|null
      */
-    private function createMethodSupportClickAndSend($destCountry, array $config, $serviceCode, $serviceName, $serviceOptionName, $serviceOptionCode)
+    private function createMethodSupportClickAndSend($destCountry, array $config, $serviceCode, $serviceName, $serviceOptionName, $serviceOptionCode, $client)
     {
         try {
             if ($destCountry == DataHelper::AUSTRALIA_COUNTRY_CODE) {
                 $config = array_merge($config, array(
                     'suboption_code' => ServiceOption::AUS_SERVICE_OPTION_EXTRA_COVER,
                 ));
-                $postageWithExtraCover = $this->_client->calculateDomesticParcelPostage($config);
+                $postageWithExtraCover = $client->calculateDomesticParcelPostage($config);
             } else {
-                $postageWithExtraCover = $this->_client->calculateInternationalParcelPostage($config);
+                $postageWithExtraCover = $client->calculateInternationalParcelPostage($config);
             }
 
             unset($config['suboption_code']);
@@ -327,8 +343,10 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
 
         if ($this->isAvailableShippingMethod($_finalName, $destCountry)) {
             $method = $this->createMethod($_finalCode, $_finalName, $servicePrice);
-            $this->_result->append($method);
+            return $method;
         }
+
+        return null;
     }
 
     /**
@@ -341,9 +359,13 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
      * @param float $servicePrice base price of service
      * @param array $config configurations
      * @param string $serviceCode base service code name
+     * @param ClientInterface $client
+     * @return Method[]
      */
-    protected function createMethodVariants($destCountry, $extraCover, array $serviceOption, $serviceName, $servicePrice, array $config, $serviceCode)
+    protected function createMethodVariants($destCountry, $extraCover, array $serviceOption, $serviceName, $servicePrice, array $config, $serviceCode, $client)
     {
+        $methods = [];
+
         foreach ($serviceOption as $option) {
             $serviceOptionName = $option['name'];
             $serviceOptionCode = $option['code'];
@@ -355,9 +377,9 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
 
             try {
                 if ($destCountry == DataHelper::AUSTRALIA_COUNTRY_CODE) {
-                    $postage = $this->_client->calculateDomesticParcelPostage($config);
+                    $postage = $client->calculateDomesticParcelPostage($config);
                 } else {
-                    $postage = $this->_client->calculateInternationalParcelPostage($config);
+                    $postage = $client->calculateInternationalParcelPostage($config);
                 }
             } catch (Exception $e) {
                 $this->_logger->error($e);
@@ -382,7 +404,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
                 )
             ) {
                 $method = $this->createMethod($_finalCode, $_finalName, $servicePrice);
-                $this->_result->append($method);
+                $methods[] = $method;
             }
 
             $extraCoverParent = $this->getCode('extra_cover');
@@ -400,9 +422,12 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
                     $this->_clickandsendHelper->isFilterShippingMethods()
                 )
             ) {
-                $this->createMethodSupportClickAndSend($destCountry, $config, $serviceCode, $serviceName, $serviceOptionName, $serviceOptionCode);
+                $method = $this->createMethodSupportClickAndSend($destCountry, $config, $serviceCode, $serviceName, $serviceOptionName, $serviceOptionCode, $client);
+                $methods[] = $method;
             }
         }
+
+        return $methods;
     }
 
     /**
@@ -410,15 +435,19 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
      *
      * @param int $extraCover size of cover
      * @param array $config configurations
+     * @param ClientInterface $client
+     * @return RateResult
      */
-    protected function getQuotes($extraCover, array $config)
+    protected function getQuotes($extraCover, array $config, $client)
     {
+        $rateResult = $this->_rateResultFactory->create();
+        $methods = [];
         $destCountry = $config['country_code'];
 
         if ($destCountry == DataHelper::AUSTRALIA_COUNTRY_CODE) {
-            $services = $this->_client->listDomesticParcelServices($config);
+            $services = $client->listDomesticParcelServices($config);
         } else {
-            $services = $this->_client->listInternationalParcelServices($config);
+            $services = $client->listInternationalParcelServices($config);
         }
 
         $allowedMethods = explode(',', $this->getConfigData('allowed_methods'));
@@ -437,7 +466,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
                     $this->isAvailableShippingMethod($serviceName, $destCountry)
                 ) {
                     $method = $this->createMethod($serviceCode, $serviceName, $servicePrice);
-                    $this->_result->append($method);
+                    $methods[] = $method;
                 } else {
                     // If a shipping method has a bunch of options, we will have to
                     // create a specific method for each of the variants
@@ -453,7 +482,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
                         $this->isAvailableShippingMethod($serviceName, $destCountry)
                     ) {
                         $method = $this->createMethod($serviceCode, $serviceName, $servicePrice);
-                        $this->_result->append($method);
+                        $methods[] = $method;
                     }
 
                     // Checks to see if the API has returned either a single
@@ -464,12 +493,17 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
                     }
 
                     // If API return Array of methods
-                    $this->createMethodVariants($destCountry, $extraCover, $serviceOption, $serviceName, $servicePrice, $config, $serviceCode);
+                    $methodVariants = $this->createMethodVariants($destCountry, $extraCover, $serviceOption, $serviceName, $servicePrice, $config, $serviceCode, $client);
+                    $methods = array_merge($methods, $methodVariants);
                 }
             }
         }
 
-        return $this->_result;
+        foreach ($methods as $method) {
+            $rateResult->append($method);
+        }
+
+        return $rateResult;
     }
 
     /**
@@ -621,49 +655,30 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
      * other cases just use the default config setting, since we can't assume
      * the dimensions of the order.
      *
-     * @param RateRequest $request Request object
+     * @param RateRequest|OrderInterface $request Request object
      * @param string $attribute Attribute code
      * @return string Attribute value
      */
-    public function getAttribute(RateRequest $request, $attribute)
+    public function getAttribute($request, $attribute)
     {
         // Check if an appropriate product attribute has been assigned in the backend and, if not,
         // just return the default weight value as later code won't work
         $attributeCode = $this->getConfigData($attribute . '_attribute');
 
         if (!$attributeCode) {
-            return $this->getConfigData($attribute . 'default_' . $attribute);
+            return $this->getConfigData('default_' . $attribute);
         }
 
-        $items = $this->getAllSimpleItems($request);
+        $items = $this->dataHelper->getAllSimpleItems($request);
 
         if (count($items) == 1) {
             $attributeValue = $items[0]->getData($attributeCode);
             if (empty($attributeValue)) {
-                return $this->getConfigData($attribute . 'default_' . $attribute);
+                return $this->getConfigData('default_' . $attribute);
             }
             return $attributeValue;
         } else {
-            $this->getConfigData($attribute . 'default_' . $attribute);
+            return $this->getConfigData('default_' . $attribute);
         }
-    }
-
-    /**
-     * Get all the simple items in an order.
-     *
-     * @param RateRequest $request Request to retrieve items for
-     * @return array List of simple products from order
-     */
-    public function getAllSimpleItems(RateRequest $request)
-    {
-        $items = array();
-
-        foreach ($request->getAllItems() as $item) {
-            if ($item->getProductType() == ProductType::TYPE_SIMPLE) {
-                $items[] = $item;
-            }
-        }
-
-        return $items;
     }
 }

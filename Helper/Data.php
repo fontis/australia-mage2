@@ -17,8 +17,10 @@
 
 namespace Fontis\Australia\Helper;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Quote\Model\Quote\Address\RateRequest;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\ScopeInterface;
 
 class Data extends AbstractHelper
@@ -77,5 +79,24 @@ class Data extends AbstractHelper
     public function shouldRemovePostOfficeBoxes($store = null)
     {
         return $this->scopeConfig->isSetFlag("fontis_australia/postcode_autocomplete/remove_post_office_boxes", ScopeInterface::SCOPE_STORE, $store);
+    }
+
+    /**
+     * Get all the simple items in an order.
+     *
+     * @param RateRequest|OrderInterface $request Request to retrieve items for
+     * @return array List of simple products from order
+     */
+    public function getAllSimpleItems($request)
+    {
+        $items = array();
+
+        foreach ($request->getAllItems() as $item) {
+            if ($item->getProductType() === ProductType::TYPE_SIMPLE) {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
     }
 }

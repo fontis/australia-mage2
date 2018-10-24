@@ -28,6 +28,15 @@
                     </item>
                 </argument>
             </action>
+            <action name="fontis_australia_export_click_and_send">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">fontis_australia_export_click_and_send</item>
+                        <item name="label" xsi:type="string" translate="true">Export to Click and Send</item>
+                        <item name="url" xsi:type="url" path="fontis_australia/clickandsend/exportorders"/>
+                    </item>
+                </argument>
+            </action>
         </massaction>
     </listingToolbar>
 </listing>

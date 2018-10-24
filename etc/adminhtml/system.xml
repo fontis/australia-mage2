@@ -47,6 +47,63 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Don't display Australia Post shipping methods that can't be imported into Click &amp; Send during checkout.</comment>
                 </field>
+                <field id="category_of_items" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category of Items</label>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\CategoriesItem</source_model>
+                </field>
+                <field id="category_of_items_explanation" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category of Items Explanation</label>
+                    <comment>This is mandatory if Category of Items is Other.</comment>
+                </field>
+                <field id="nondelivery_instructions" translate="label" sortOrder="3" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Non-delivery instructions</label>
+                    <source_model>Fontis\Australia\Model\Shipping\Source\InstructionsNonDelivery</source_model>
+                </field>
+                <field id="return_address" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Return Address</label>
+                    <comment>Return to the following address if undeliverable</comment>
+                </field>
+                <field id="from_name" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Name</label>
+                </field>
+                <field id="from_company_name" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Company Name</label>
+                </field>
+                <field id="from_phone" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Phone</label>
+                </field>
+                <field id="from_fax" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Fax</label>
+                </field>
+                <field id="from_email" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Email</label>
+                </field>
+                <field id="from_abn" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From ABN</label>
+                    <comment>Click &amp; Send does not support adding spaces to your ABN.</comment>
+                </field>
+                <field id="from_address_line_1" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Address (Line 1)</label>
+                </field>
+                <field id="from_address_line_2" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Address (Line 2)</label>
+                </field>
+                <field id="from_address_line_3" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Address (Line 3)</label>
+                </field>
+                <field id="from_city" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From City / Suburb</label>
+                </field>
+                <field id="from_state" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From State</label>
+                </field>
+                <field id="from_postcode" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Postcode</label>
+                </field>
+                <field id="from_country" translate="label" type="select" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>From Country</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
             </group>
             <group id="postcode_autocomplete" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Postcode Autocomplete</label>

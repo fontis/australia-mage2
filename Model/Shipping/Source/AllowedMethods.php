@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Fontis Australia Extension for Magento 2
  *
