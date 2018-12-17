@@ -8,12 +8,12 @@
         "fontis/auspost-api-php": "^1.0.5",
         "fontis/bpay-ref-generator": "^1.0.0|^2.0.0",
         "fontis/customergroupaccess-mage2": "^1.0.1",
-        "magento/framework": "100.*|101.*",
-        "magento/module-checkout": "100.*",
-        "magento/module-directory": "100.*",
-        "magento/module-payment": "100.*",
-        "magento/module-store": "100.*",
-        "magento/module-shipping": "100.*"
+        "magento/framework": "100.*|101.*|102.*",
+        "magento/module-checkout": "100.*|101.*|102.*",
+        "magento/module-directory": "100.*|101.*|102.*",
+        "magento/module-payment": "100.*|101.*|102.*",
+        "magento/module-store": "100.*|101.*|102.*",
+        "magento/module-shipping": "100.*|101.*|102.*"
     },
     "autoload": {
         "files": [
