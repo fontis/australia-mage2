@@ -69,6 +69,9 @@ class Eparcel extends AbstractCarrier implements CarrierInterface
     /** @var EparcelResource  */
     protected $eparcelResource;
 
+    /** @var TrackingResultFactory */
+    protected $trackingResultFactory;
+
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         ErrorFactory $rateErrorFactory,
@@ -88,6 +91,7 @@ class Eparcel extends AbstractCarrier implements CarrierInterface
         $this->rateMethodFactory = $rateMethodFactory;
         $this->customerSession = $customerSession;
         $this->eparcelResource = $eparcelResource;
+        $this->trackingResultFactory = $trackingResultFactory;
         $this->statusFactory = $statusFactory;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger);
 
