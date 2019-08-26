@@ -134,7 +134,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
         }
 
         $fromPostcode = $this->_scopeConfig->getValue(Config::XML_PATH_ORIGIN_POSTCODE, ScopeInterface::SCOPE_STORE, $request->getStoreId());
-        $toPostcode = (int) $request->getDestPostcode();
+        $toPostcode = $request->getDestPostcode();
         $destCountry = $request->getDestCountryId();
 
         if (!$destCountry) {
@@ -149,7 +149,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
         $extraCover = max((int) $request->getPackageValue(), self::EXTRA_COVER_LIMIT);
 
         $config = array(
-            'from_postcode' => (int) $fromPostcode,
+            'from_postcode' => $fromPostcode,
             'to_postcode' => $toPostcode,
             'length' => $length,
             'width' => $width,
@@ -171,7 +171,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
      */
     protected function getOptionVisibilities($destCountry, $visibility)
     {
-        $suboptions = array();
+        $suboptions = [];
 
         if ($this->getPickUp() == $visibility && $destCountry != DataHelper::AUSTRALIA_COUNTRY_CODE) {
             $suboptions[] = 'pick up';
