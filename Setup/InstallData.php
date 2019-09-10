@@ -53,9 +53,21 @@ class InstallData implements InstallDataInterface
             ["WA", "Western Australia"],
         ];
 
+        $connection = $setup->getConnection();
         foreach ($states as $state) {
+            // Check if this region has already been added
+            $result = $connection->fetchOne("SELECT code FROM "
+                . $countryRegionTable
+                . " WHERE `country_id` = 'AU' AND `code` = '"
+                . $state[0] . "'"
+            );
+
+            if ($result === $state[0]) {
+                continue; // State exists. Skip it.
+            }
+
             $bind = ["country_id" => "AU", "code" => $state[0], "default_name" => $state[1]];
-            $setup->getConnection()->insert($countryRegionTable, $bind);
+            $connection->insert($countryRegionTable, $bind);
             $regionId = $setup->getConnection()->lastInsertId($countryRegionTable);
 
             $columns = ["locale", "region_id", "name"];
@@ -63,7 +75,7 @@ class InstallData implements InstallDataInterface
                 ["en_AU", $regionId, $state[1]],
                 ["en_US", $regionId, $state[1]],
             ];
-            $setup->getConnection()->insertArray($countryRegionNameTable, $columns, $values);
+            $connection->insertArray($countryRegionNameTable, $columns, $values);
         }
     }
 }
