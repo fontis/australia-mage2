@@ -517,7 +517,7 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
         $formatMethods = array();
 
         foreach ($methods as $method) {
-            $formatMethods[$method] = $this->getConfigData('title');
+            $formatMethods[$method] = $this->getCode('services', $method);
         }
 
         return $formatMethods;
