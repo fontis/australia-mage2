@@ -42,6 +42,9 @@ use Magento\Shipping\Model\Rate\Result as RateResult;
 use Magento\Shipping\Model\Rate\ResultFactory;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
+use Magento\Shipping\Model\Tracking\ResultFactory as TrackingResultFactory;
+use Magento\Shipping\Model\Tracking\Result as TrackingResult;
+use Magento\Shipping\Model\Tracking\Result\StatusFactory;
 
 class AustraliaPost extends AbstractCarrier implements CarrierInterface
 {
@@ -67,12 +70,21 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
     /** @var DataHelper */
     protected $dataHelper;
 
+    /** @var TrackingResultFactory */
+    protected $trackingResultFactory;
+
+    /** @var StatusFactory */
+    protected $statusFactory;
+
     /**
+     * AustraliaPost constructor.
      * @param CheckoutSession $checkoutSession
      * @param ClickAndSend $clickandsendHelper
      * @param ErrorFactory $rateErrorFactory
      * @param LoggerInterface $logger
      * @param MethodFactory $rateMethodFactory
+     * @param TrackingResultFactory $trackingResultFactory
+     * @param StatusFactory $statusFactory
      * @param ResultFactory $rateResultFactory
      * @param ScopeConfigInterface $scopeConfig
      * @param DataHelper $dataHelper
@@ -84,16 +96,20 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
         ErrorFactory $rateErrorFactory,
         LoggerInterface $logger,
         MethodFactory $rateMethodFactory,
+        TrackingResultFactory $trackingResultFactory,
+        StatusFactory $statusFactory,
         ResultFactory $rateResultFactory,
         ScopeConfigInterface $scopeConfig,
         DataHelper $dataHelper,
         array $data = []
     ) {
+        $this->trackingResultFactory = $trackingResultFactory;
         $this->_clickandsendHelper = $clickandsendHelper;
         $this->_rateResultFactory = $rateResultFactory;
         $this->_rateMethodFactory = $rateMethodFactory;
         $this->checkoutSession = $checkoutSession;
         $this->dataHelper = $dataHelper;
+        $this->statusFactory = $statusFactory;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -680,5 +696,63 @@ class AustraliaPost extends AbstractCarrier implements CarrierInterface
         } else {
             return $this->getConfigData('default_' . $attribute);
         }
+    }
+
+    /**
+     * Get info from tracking number
+     *
+     * @param string $tracking
+     * @return string|TrackingResult
+     */
+    public function getTrackingInfo($tracking)
+    {
+        $result = $this->getTracking($tracking);
+
+        if ($result instanceof TrackingResult) {
+            if ($trackings = $result->getAllTrackings()) {
+                return $trackings[0];
+            }
+        } elseif (is_string($result) && !empty($result)) {
+            return $result;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get tracking
+     *
+     * @param array|string $trackings
+     * @return TrackingResultFactory
+     */
+    public function getTracking($trackings)
+    {
+        if (!is_array($trackings)) {
+            $trackings = array($trackings);
+        }
+
+        return $this->privGetTracking($trackings);
+    }
+
+    /**
+     * Get tracking info detail
+     *
+     * @param array $trackings
+     * @return TrackingResultFactory
+     */
+    protected function privGetTracking($trackings)
+    {
+        $result = $this->trackingResultFactory->create();
+
+        foreach ($trackings as $t) {
+            $tracking = $this->statusFactory->create();
+            $tracking->setCarrier($this->_code);
+            $tracking->setCarrierTitle($this->getConfigData('title'));
+            $tracking->setTracking($t);
+            $tracking->setUrl('https://auspost.com.au/track/');
+            $result->append($tracking);
+        }
+
+        return $result;
     }
 }
